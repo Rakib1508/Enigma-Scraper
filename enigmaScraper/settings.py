@@ -66,7 +66,10 @@ AJAXCRAWL_ENABLED = True
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
+    # 'scrapy.pipelines.images.ImagesPipeline': 1,
+    'enigmaScraper.pipelines.DefaultValuesPipeline': 100,
     'enigmaScraper.pipelines.EnigmaSpiderPipeline': 300,
+    'enigmaScraper.pipelines.StoreSQLPipeline': 500,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -99,4 +102,6 @@ SCHEDULER_MEMORY_QUEUE = 'scrapy.squeues.FifoMemoryQueue'
 SCHEDULER_DISK_QUEUE = 'scrapy.squeues.PickleFifoDiskQueue'
 SCHEDULER_PRIORITY_QUEUE = 'scrapy.pqueues.DownloaderAwarePriorityQueue'
 
-# IMAGES_STORE = '../../enigma/images/'
+CLOSESPIDER_PAGECOUNT = 10
+
+# IMAGES_STORE = '../data-center/collection/'
