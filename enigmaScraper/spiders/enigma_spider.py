@@ -3,30 +3,26 @@ import validators
 from urllib.parse import urljoin, urlparse
 from ..items import EnigmaScraperItem
 from scrapy.loader import ItemLoader
-from ..LinkLoader import load_urls
+from ..LinkLoader import load_urls, load_domains
 
 
 class EnigmaSpider(scrapy.Spider):
     # unique name to call the spider
     name = 'enigma'
     start_urls = load_urls()
+    allowed_domains = load_domains()
 
-    COUNT_MAX = 10
-    custom_settings = {
-        'CLOSESPIDER_PAGECOUNT': COUNT_MAX
-    }
+    """def start_requests(self) -> 'response':
+        when the spider is run, this method is called which access all the necessary
+        settings to complete the request format. And then the method sends the request
+        to spider -> engine -> downloaderMiddleware -> downloader. Finally,
+        the downloader makes the request to the distant server.
 
-    # def start_requests(self) -> 'response':
-    # """when the spider is run, this method is called which access all the necessary
-    # settings to complete the request format. And then the method sends the request
-    # to spider -> engine -> downloaderMiddleware -> downloader. Finally,
-    # the downloader makes the request to the distant server."""
-
-    # urls = [
-    # 'https://en.wikipedia.org/wiki/Apple_Inc.',
-    # ]
-    # for url in urls:
-    # yield scrapy.Request(url=url, callback=self.parse)
+        urls = [
+            'https://en.wikipedia.org/wiki/Apple_Inc.',
+        ]
+        for url in urls:
+            yield scrapy.Request(url=url, callback=self.parse)"""
 
     def parse(self, response: bytes) -> 'response_parser':
         """spider sends request to the downloader from the engine which was taken from the
@@ -57,14 +53,17 @@ class EnigmaSpider(scrapy.Spider):
         items.add_value('domain', self.get_domain(response.url))
         items.add_value('meta_tags', meta_tags)
         items.add_css('page_title', 'title')
-        items.add_css('html_body', 'body')
-        items.add_value('word_dictionary', 'body')
+        items.add_css('content', 'body')
+        items.add_value('content_length', 1)
+        items.add_css('word_dictionary', 'body')
         items.add_value('links', links)
+        items.add_value('old_rank', 0.0)
+        items.add_value('new_rank', 1.0)
 
         yield items.load_item()
 
-        # for url in links:
-        # yield scrapy.Request(url, callback=self.parse)
+        for url in links:
+            yield scrapy.Request(url, callback=self.parse)
 
     def get_domain(self, url: 'string') -> 'string':
         """This function requires one parameter, i.e. unique URL of any webpage.

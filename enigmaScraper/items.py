@@ -47,11 +47,19 @@ class EnigmaScraperItem(scrapy.Item):
     meta_tags = scrapy.Field(
         output_processor=TakeFirst()
     )
-    html_body = scrapy.Field(
+    content = scrapy.Field(
+        input_processor=MapCompose(
+            script_tag_remover, remove_tags, text_preprocessor,
+        ),
+        output_processor=TakeFirst()
+    )
+    content_length = scrapy.Field()
+    word_dictionary = scrapy.Field(
         input_processor=MapCompose(
             script_tag_remover, remove_tags, text_preprocessor, drop_stopwords, stemmer,
         ),
         output_processor=TakeFirst()
     )
-    word_dictionary = scrapy.Field()
     links = scrapy.Field()
+    old_rank = scrapy.Field(output_processor=TakeFirst())
+    new_rank = scrapy.Field(output_processor=TakeFirst())

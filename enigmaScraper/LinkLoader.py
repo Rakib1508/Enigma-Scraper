@@ -1,15 +1,29 @@
-import sqlite3
+from pymongo import MongoClient
 
 
 def load_urls():
-    conn = sqlite3.connect('../data-center/library/enigma.sqlite')
-    cursor = conn.cursor()
+    client = MongoClient('localhost', 27017)
+    pipeline = [{
+            "$unwind": "$links"
+        },
+        {
+            "$match": {
+                "url": {"$ne": "links"}
+            }
+        },
+        {
+            "$project": {"_id": 0, "links": 1}
+        }]
 
-    cursor.execute('SELECT url FROM Pages WHERE html is NULL ORDER BY RANDOM() LIMIT 1000')
-    links = cursor.fetchall()
+    result = list(client['enigma']['crawled_pages'].aggregate(pipeline=pipeline))
+    links = set()
+    for item in result:
+        links.add(item['links'])
 
-    urls = []
-    for link in links:
-        urls.append(link[0])
+    return list(links)
 
-    return urls
+
+def load_domains():
+    with open('allowed-domains.txt', 'r') as file:
+        domains = file.read().splitlines()
+    return domains

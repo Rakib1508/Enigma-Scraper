@@ -14,13 +14,13 @@ NEWSPIDER_MODULE = 'enigmaScraper.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-USER_AGENT = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+# USER_AGENT = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 100
+CONCURRENT_REQUESTS = 300
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -57,6 +57,11 @@ AJAXCRAWL_ENABLED = True
 #    'enigmaScraper.middlewares.EnigmascraperDownloaderMiddleware': 543,
 #}
 
+DOWNLOADER_MIDDLEWARES = {
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+    'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
+}
+
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
 #EXTENSIONS = {
@@ -66,10 +71,8 @@ AJAXCRAWL_ENABLED = True
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    # 'scrapy.pipelines.images.ImagesPipeline': 1,
     'enigmaScraper.pipelines.DefaultValuesPipeline': 100,
     'enigmaScraper.pipelines.EnigmaSpiderPipeline': 300,
-    'enigmaScraper.pipelines.StoreSQLPipeline': 500,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -102,6 +105,4 @@ SCHEDULER_MEMORY_QUEUE = 'scrapy.squeues.FifoMemoryQueue'
 SCHEDULER_DISK_QUEUE = 'scrapy.squeues.PickleFifoDiskQueue'
 SCHEDULER_PRIORITY_QUEUE = 'scrapy.pqueues.DownloaderAwarePriorityQueue'
 
-CLOSESPIDER_PAGECOUNT = 10
-
-# IMAGES_STORE = '../data-center/collection/'
+CLOSESPIDER_PAGECOUNT = 300
