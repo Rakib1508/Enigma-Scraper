@@ -2,9 +2,20 @@ import scrapy
 from itemloaders.processors import TakeFirst, MapCompose
 from w3lib.html import remove_tags, remove_tags_with_content
 from nltk.corpus import stopwords
-from nltk.stem import PorterStemmer
+from nltk import pos_tag
+from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
+from nltk.corpus import wordnet
 
+
+def get_wordnet_pos(word):
+    """Map POS tag to first character lemmatize() accepts"""
+    tag = pos_tag([word])[0][1][0].upper()
+    tag_dict = {"J": wordnet.ADJ,
+                "N": wordnet.NOUN,
+                "V": wordnet.VERB,
+                "R": wordnet.ADV}
+    return tag_dict.get(tag, wordnet.NOUN)
 
 
 def script_tag_remover(html):
@@ -24,11 +35,11 @@ def drop_stopwords(text):
     return ' '.join(words)
 
 
-def stemmer(text):
+def lemmatizer(text):
     words = []
-    ps = PorterStemmer()
+    lm = WordNetLemmatizer()
     for word in word_tokenize(text):
-        words.append(ps.stem(word))
+        words.append(lm.lemmatize(word, get_wordnet_pos(word)))
     return ' '.join(words)
 
 
@@ -56,7 +67,7 @@ class EnigmaScraperItem(scrapy.Item):
     content_length = scrapy.Field()
     word_dictionary = scrapy.Field(
         input_processor=MapCompose(
-            script_tag_remover, remove_tags, text_preprocessor, drop_stopwords, stemmer,
+            script_tag_remover, remove_tags, text_preprocessor, lemmatizer, drop_stopwords,
         ),
         output_processor=TakeFirst()
     )

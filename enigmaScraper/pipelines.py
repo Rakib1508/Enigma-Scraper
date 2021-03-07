@@ -16,7 +16,7 @@ class EnigmaSpiderPipeline:
         return item
 
     def dict_builder(self, item):
-        word_dictionary = {}
+        word_dictionary = dict()
         for word in word_tokenize(item['word_dictionary']):
             if word.islower() and word.isalpha():
                 if word in word_dictionary:
@@ -30,7 +30,7 @@ class EnigmaSpiderPipeline:
             dictionary[key]['tf'] = word_dictionary[key] / item['content_length']
             dictionary[key]['idf'] = 0.0
             dictionary[key]['tfidf'] = 0.0
-        item['word_dictionary'] = dictionary
+        item['word_dictionary'] = dict(sorted(dictionary.items()))
         return item
 
 
